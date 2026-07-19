@@ -1,0 +1,238 @@
+/* ==========================================================================
+   Complex, genuinely-custom effects that don't translate cleanly to
+   utility classes: keyframes, multi-layer gradients, masks, and
+   composite effects reused across many components.
+   Everything else (layout, spacing, simple hover states) lives as
+   Tailwind utilities directly in JSX.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------
+   Honeycomb loader — Uiverse.io by boryanakrasteva (kept verbatim)
+   -------------------------------------------------------------------- */
+@keyframes honeycomb {
+  0%,
+  20%,
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.honeycomb {
+  height: 24px;
+  position: relative;
+  width: 24px;
+}
+.honeycomb div {
+  animation: honeycomb 2.1s infinite backwards;
+  background: var(--primary);
+  height: 12px;
+  margin-top: 6px;
+  position: absolute;
+  width: 24px;
+}
+.honeycomb div:after,
+.honeycomb div:before {
+  content: '';
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.honeycomb div:after {
+  top: -6px;
+  border-bottom: 6px solid var(--primary);
+}
+.honeycomb div:before {
+  bottom: -6px;
+  border-top: 6px solid var(--primary);
+}
+.honeycomb div:nth-child(1) {
+  animation-delay: 0s;
+  left: -28px;
+  top: 0;
+}
+.honeycomb div:nth-child(2) {
+  animation-delay: 0.1s;
+  left: -14px;
+  top: 22px;
+}
+.honeycomb div:nth-child(3) {
+  animation-delay: 0.2s;
+  left: 14px;
+  top: 22px;
+}
+.honeycomb div:nth-child(4) {
+  animation-delay: 0.3s;
+  left: 28px;
+  top: 0;
+}
+.honeycomb div:nth-child(5) {
+  animation-delay: 0.4s;
+  left: 14px;
+  top: -22px;
+}
+.honeycomb div:nth-child(6) {
+  animation-delay: 0.5s;
+  left: -14px;
+  top: -22px;
+}
+.honeycomb div:nth-child(7) {
+  animation-delay: 0.6s;
+  left: 0;
+  top: 0;
+}
+
+/* --------------------------------------------------------------------
+   Hero background — animated gradient mesh + faint charting grid
+   -------------------------------------------------------------------- */
+@keyframes mesh-flow {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-3%, 2%) scale(1.06);
+  }
+}
+.gradient-mesh {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 200, 150, 0.22), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.2), transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(0, 200, 150, 0.12), transparent 55%), linear-gradient(180deg, var(--secondary) 0%, #050810 70%);
+  filter: blur(10px);
+  animation: mesh-flow 18s ease-in-out infinite alternate;
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 75%);
+}
+
+/* --------------------------------------------------------------------
+   Scrolling "pulse wave" section divider under the hero
+   -------------------------------------------------------------------- */
+@keyframes pulse-scroll {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -1200px;
+  }
+}
+.pulse-divider {
+  height: 60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30 L100 30 L130 10 L160 50 L190 20 L220 30 L1200 30' fill='none' stroke='%233B82F6' stroke-width='2' opacity='0.45'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 1200px 60px;
+  animation: pulse-scroll 14s linear infinite;
+  opacity: 0.7;
+}
+
+/* --------------------------------------------------------------------
+   Floating P&L card
+   -------------------------------------------------------------------- */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.floating {
+  animation: floaty 5s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------
+   Glassmorphism card — reused across chart card, dashboard preview,
+   feature/pricing/testimonial cards. Composite backdrop-filter + inner
+   highlight + layered shadow isn't practical as a one-off utility
+   string, so it lives here as a single reusable class.
+   -------------------------------------------------------------------- */
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow:
+      var(--shadow-md),
+      inset 0 1px 0 var(--glass-highlight);
+  }
+}
+
+/* --------------------------------------------------------------------
+   Hero headline gradient text
+   -------------------------------------------------------------------- */
+.hero-heading-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #e6edf3 55%, #b9c6d9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* --------------------------------------------------------------------
+   Portfolio allocation ring — conic-gradient donut, --pct set inline
+   -------------------------------------------------------------------- */
+.allocation-ring {
+  background: conic-gradient(var(--primary) calc(var(--pct) * 1%), var(--border) 0);
+}
+
+/* --------------------------------------------------------------------
+   Cursor-follow spotlight glow — --mx/--my (%) set on mousemove.
+   Clipped via its own border-radius rather than overflow:hidden on
+   the card, so elements that intentionally overflow the card (e.g.
+   the pricing "Most Popular" badge) aren't cut off.
+   -------------------------------------------------------------------- */
+.spotlight {
+  position: relative;
+}
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 0%), rgba(var(--primary-rgb), 0.12), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-brand);
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+.spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------
+   3D tilt surface for the hero chart card — perspective lives on the
+   parent, rotation values are applied inline by the component on
+   pointer move.
+   -------------------------------------------------------------------- */
+.tilt-perspective {
+  perspective: 1200px;
+}
+.tilt-surface {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-surface {
+    transform: none !important;
+  }
+}

@@ -1,0 +1,230 @@
+@import 'tailwindcss';
+@import './animations.css';
+
+/* ==========================================================================
+   Design tokens — runtime-switchable CSS custom properties.
+   These hold the ACTUAL values and flip when [data-theme] changes on
+   <html>; the @theme block below just re-exports them as Tailwind
+   utilities (bg-bg, text-primary, etc.) so every utility class stays
+   theme-aware without needing dark: variants sprinkled everywhere.
+   ========================================================================== */
+:root {
+  --primary: #00c896;
+  --primary-dim: #00a67d;
+  --primary-rgb: 0, 200, 150;
+  --secondary: #0b1f3a;
+  --danger: #ff4d4f;
+  --accent: #3b82f6;
+  --accent-rgb: 59, 130, 246;
+
+  /* WCAG-AA-safe variants for green/red/blue used as small text on light
+     surfaces — the vivid brand hues fall below 4.5:1 on white.
+     --primary/--danger are unchanged in dark mode, where those hues
+     already pass; --accent-text gets its own slightly-lighter dark-mode
+     value below since raw --accent (#3b82f6) only reaches ~4.46:1 on
+     dark surfaces here, just under the 4.5:1 AA threshold. */
+  --primary-text: var(--primary);
+  --danger-text: var(--danger);
+  --accent-text: #4a8cf7;
+
+  --bg: #0e1117;
+  --surface: #161b22;
+  --surface-2: #1c232e;
+  --border: rgba(230, 237, 243, 0.08);
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --muted-on-dark: #9fb0c9;
+
+  --glass-bg: rgba(22, 27, 34, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 6px -2px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 12px 28px -12px rgba(0, 0, 0, 0.5), 0 4px 10px -4px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.55), 0 8px 20px -8px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 0 1px rgba(var(--primary-rgb), 0.25), 0 16px 40px -12px rgba(var(--primary-rgb), 0.35);
+
+  --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --container-width: 1200px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --section-pad: clamp(64px, 9vw, 112px);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f7f9fc;
+  --surface: #ffffff;
+  --surface-2: #eef2f8;
+  --border: rgba(11, 31, 58, 0.09);
+  --text: #0b1f3a;
+  --text-muted: #5b6577;
+
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(11, 31, 58, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.5);
+
+  --primary-text: #007a55;
+  --danger-text: #c4283a;
+  --accent-text: #1d4ed8;
+
+  --shadow-xs: 0 1px 2px rgba(11, 31, 58, 0.06);
+  --shadow-sm: 0 2px 6px -2px rgba(11, 31, 58, 0.1), 0 1px 2px rgba(11, 31, 58, 0.06);
+  --shadow-md: 0 12px 28px -12px rgba(11, 31, 58, 0.16), 0 4px 10px -4px rgba(11, 31, 58, 0.1);
+  --shadow-lg: 0 24px 60px -20px rgba(11, 31, 58, 0.2), 0 8px 20px -8px rgba(11, 31, 58, 0.12);
+  --shadow-glow: 0 0 0 1px rgba(var(--primary-rgb), 0.3), 0 16px 40px -12px rgba(var(--primary-rgb), 0.25);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg: #f7f9fc;
+    --surface: #ffffff;
+    --surface-2: #eef2f8;
+    --border: rgba(11, 31, 58, 0.09);
+    --text: #0b1f3a;
+    --text-muted: #5b6577;
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(11, 31, 58, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.5);
+    --primary-text: #007a55;
+    --danger-text: #c4283a;
+    --accent-text: #1d4ed8;
+    --shadow-md: 0 12px 28px -12px rgba(11, 31, 58, 0.16), 0 4px 10px -4px rgba(11, 31, 58, 0.1);
+    --shadow-lg: 0 24px 60px -20px rgba(11, 31, 58, 0.2), 0 8px 20px -8px rgba(11, 31, 58, 0.12);
+    color-scheme: light;
+  }
+}
+
+/* ==========================================================================
+   Tailwind theme — re-exports the tokens above as utility classes
+   (bg-bg, text-primary, shadow-md, rounded-lg, ease-brand, font-sans…)
+   ========================================================================== */
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-dim: var(--primary-dim);
+  --color-primary-text: var(--primary-text);
+  --color-secondary: var(--secondary);
+  --color-danger: var(--danger);
+  --color-danger-text: var(--danger-text);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-muted-on-dark: var(--muted-on-dark);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-glow: var(--shadow-glow);
+
+  --ease-brand: var(--ease-brand);
+  --ease-spring: var(--ease-spring);
+
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Fluid, clamp()-based type scale — matches the original section rhythm */
+  --text-h1: clamp(2.5rem, 5.4vw, 4.2rem);
+  --text-h1--line-height: 1.05;
+  --text-h2: clamp(1.85rem, 3.4vw, 2.75rem);
+  --text-h2--line-height: 1.15;
+  --text-stat: clamp(1.9rem, 3.1vw, 2.5rem);
+  --text-stat--line-height: 1.1;
+
+  /* Exact original breakpoints (desktop-first max-width thresholds,
+     re-expressed as mobile-first min-width so Tailwind's cascade
+     produces byte-identical results at every width). */
+  --breakpoint-sm: 481px;
+  --breakpoint-md: 721px;
+  --breakpoint-lg: 901px;
+  --breakpoint-xl: 1025px;
+  --breakpoint-2xl: 1181px;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv11', 'ss01';
+  transition:
+    background-color 0.35s var(--ease-brand),
+    color 0.35s var(--ease-brand);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(var(--primary-rgb), 0.32);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+button:focus-visible,
+a:focus-visible {
+  outline-offset: 4px;
+}
+
+.tabular-figures {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
