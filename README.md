@@ -67,3 +67,6 @@ Every module under `services/` is deterministic, seeded mock data/logic (`servic
 ## License
 
 Not currently licensed for reuse — portfolio/demonstration project.
+
+
+   
